@@ -1,0 +1,14 @@
+
+void setup() {
+  Serial.begin(115200);
+  // Initialize camera
+  // Load trained face data
+}
+
+void loop() {
+  // Capture frame
+  // Detect face
+  // Compare with stored dataset
+  // If match found:
+  // Trigger audio message (e.g., "Father Detected")
+}
