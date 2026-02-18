@@ -1,0 +1,58 @@
+#include <NewPing.h>
+#include <SoftwareSerial.h>
+#include <DFRobotDFPlayerMini.h>
+
+#define MAX_DISTANCE 200
+
+// Left Sensor
+#define TRIG_L 2
+#define ECHO_L 3
+
+// Center Sensor
+#define TRIG_C 4
+#define ECHO_C 5
+
+// Right Sensor
+#define TRIG_R 8
+#define ECHO_R 9
+
+NewPing sonarLeft(TRIG_L, ECHO_L, MAX_DISTANCE);
+NewPing sonarCenter(TRIG_C, ECHO_C, MAX_DISTANCE);
+NewPing sonarRight(TRIG_R, ECHO_R, MAX_DISTANCE);
+
+SoftwareSerial mySerial(10, 11);
+DFRobotDFPlayerMini dfplayer;
+
+void setup() {
+  Serial.begin(9600);
+  mySerial.begin(9600);
+
+  if (!dfplayer.begin(mySerial)) {
+    Serial.println("DFPlayer Error!");
+    while(true);
+  }
+
+  dfplayer.volume(20);
+  Serial.println("Echo-Vision Belt - 3 Sensor Mode");
+}
+
+void loop() {
+  delay(200);
+
+  int leftDist = sonarLeft.ping_cm();
+  int centerDist = sonarCenter.ping_cm();
+  int rightDist = sonarRight.ping_cm();
+
+  if (centerDist > 0 && centerDist <= 60) {
+    dfplayer.play(1); // 0001.mp3 -> "Obstacle Ahead"
+    delay(1000);
+  }
+  else if (leftDist > 0 && leftDist <= 60) {
+    dfplayer.play(2); // 0002.mp3 -> "Obstacle on Left"
+    delay(1000);
+  }
+  else if (rightDist > 0 && rightDist <= 60) {
+    dfplayer.play(3); // 0003.mp3 -> "Obstacle on Right"
+    delay(1000);
+  }
+}
