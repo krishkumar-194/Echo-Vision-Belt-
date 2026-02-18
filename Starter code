@@ -1,0 +1,46 @@
+#include <NewPing.h>
+#include <SoftwareSerial.h>
+#include <DFRobotDFPlayerMini.h>
+
+// Ultrasonic Sensor Pins
+#define TRIG_PIN  9
+#define ECHO_PIN 10
+#define MAX_DISTANCE 200 // Maximum distance to detect (in cm)
+
+// DFPlayer Mini pins
+SoftwareSerial mySerial(7, 6); // RX, TX
+DFRobotDFPlayerMini dfplayer;
+
+// Initialize ultrasonic sensor
+NewPing sonar(TRIG_PIN, ECHO_PIN, MAX_DISTANCE);
+
+void setup() {
+  Serial.begin(9600);
+  mySerial.begin(9600);
+  
+  // Initialize DFPlayer Mini
+  if (!dfplayer.begin(mySerial)) {
+    Serial.println("DFPlayer Error!");
+    while(true);
+  }
+  dfplayer.volume(20); // Set volume (0-30)
+  
+  Serial.println("Echo-Vision Belt Initialized!");
+}
+
+void loop() {
+  delay(200); // Small delay between readings
+  unsigned int distance = sonar.ping_cm();
+  
+  if (distance > 0 && distance <= 50) { // Obstacle detected within 50 cm
+    Serial.print("Obstacle detected at ");
+    Serial.print(distance);
+    Serial.println(" cm");
+    
+    // Play voice alert
+    dfplayer.play(1); // Audio file 0001.mp3 on DFPlayer
+    delay(1000); // Wait to avoid overlapping alerts
+  } else {
+    Serial.println("No obstacle detected");
+  }
+}
